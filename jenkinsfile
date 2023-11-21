@@ -1,0 +1,26 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('clone scm') {
+            steps {
+                echo 'clone project from github'
+         git branch: 'main', credentialsId: 'github', url: 'https://github.com/sanvivarma/sanvirepo.git'
+            }
+        }
+
+        stage('build') {
+            steps {
+                echo 'build with mvn'
+             sh 'mvn clean install'
+            }
+        }
+   
+        stage('Deployment') {
+            steps {
+                echo 'Deployment to tomcat'
+             deploy adapters: [tomcat9(credentialsId: 'd3701ed5-a20e-4108-af59-6a20e66cfd40', path: 'fb', url: 'http://54.161.25.122:8090/')], contextPath: 'fb', war: '**/*.war'
+            }
+        }
+    }
+}
